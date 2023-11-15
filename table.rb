@@ -15,7 +15,7 @@ class Table
   end
 
   def each
-    matrix.each { |row| row.each { |col| yield col } }
+    getTableMatrix.each { |row| row.each { |col| yield col } }
   end
 
   def [](index)

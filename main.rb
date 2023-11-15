@@ -25,3 +25,5 @@ p readSheets.row(2)
 # value = readSheets["Prva kolona"][0]
 
 # p readSheets["Prva kolona"][0]
+
+readSheets.each {|col| puts col}
