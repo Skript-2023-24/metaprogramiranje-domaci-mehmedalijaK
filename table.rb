@@ -2,12 +2,14 @@ class Table
 
   attr_accessor :ws
 
+  include Enumerable
+
   def initialize(ws)
     @ws = ws
   end
 
   def getTableMatrix()
-    matrix = (1..@ws.num_rows).map { |row| (1..@ws.num_cols).map { |col| @ws[row, col] } }
+    matrix = (1..@ws. _rows).map { |row| (1..@ws.num_cols).map { |col| @ws[row, col] } }
   end
 
   def row(index)
