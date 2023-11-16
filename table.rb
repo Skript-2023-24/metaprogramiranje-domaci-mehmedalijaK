@@ -114,7 +114,7 @@ class Table
     getTableMatrix
   end
 
-  def [](index) #TODO: nista
+  def [](index)
     begin
       array = (0...@ws.num_rows-1).map { |i| @ws.list[i][index] }
       Column.new(array, index, self)
@@ -124,11 +124,9 @@ class Table
     end
   end
 
-  def []=(row, column, value) #TODO: return nill
-    @ws.list[column][row] = value
+  def []=(row, column, value)
+    @ws.list[column][row].nil? ? nil : @ws.list[column][row] = value
   end
-
-
 
 end
 
