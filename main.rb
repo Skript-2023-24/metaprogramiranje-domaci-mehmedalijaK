@@ -19,6 +19,7 @@ ws1 = session.spreadsheet_by_key("1rYyruUNUuLLUn5dZFy0cO3Ee59_adsaSYOzNpW4BQq4")
 readSheets1 = Table.new(ws1)
 
 # p readSheets+readSheets1
+p readSheets.row(1)
 p readSheets1.ws
 p readSheets1.getTableMatrix
 p readSheets1.deleteEmptyRows

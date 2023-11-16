@@ -13,26 +13,26 @@ class Table
   end
 
   def getTableMatrix()
-    matrix = (1..@ws.num_rows).map { |row| (1..@ws.num_cols).map { |col| @ws[row, col] } }
+    matrix = (1..@ws.num_rows).map { |row| (1..@ws.num_cols).map { |col| @ws[row, col] } } #TODO: nista
   end
 
   def row(index)
-    array = (1..@ws.num_cols).map { |col| @ws[index, col] }
+    array = (1..@ws.num_cols).map { |col| @ws[index, col] } #TODO: nista
   end
 
   def each
-    getTableMatrix.each { |row| row.each { |col| yield col } }
+    getTableMatrix.each { |row| row.each { |col| yield col } } #TODO: nista
   end
 
-  def sum
+  def sum #TODO: exception
     @selected.map(&:to_f).sum
   end
 
-  def avg
+  def avg #TODO: exception
     @selected.map(&:to_f).sum/@selected.length
   end
 
-  def map
+  def map #TODO: nista
     results = []
     @selected.each do |element|
       results << yield(element)
@@ -40,7 +40,7 @@ class Table
     results
   end
 
-  def select
+  def select #TODO: nista
     result = []
     @selected.each do |element|
       result << element if yield(element)
@@ -48,17 +48,15 @@ class Table
     result
   end
 
-  def reduce(init_val = nil)
+  def reduce(init_val = nil) #TODO: nista
     accumulator = init_val.nil? ? @selected[0].to_f : init_val
-
     @selected.each do |element|
       accumulator = yield(accumulator, element.to_f)
     end
-
     accumulator
   end
 
-  def deleteEmptyRows()
+  def deleteEmptyRows() #TODO: check
     # matrix = getTableMatrix.reject.each_with_index { |row, index| row.all? { |element| element.nil? || element.to_s.strip.empty? } }
     empty_rows = (getTableMatrix.each_with_index.select { |row, index| row.all? { |element| element.nil? || element.to_s.strip.empty? } }).map{|pair| pair.last}
     delete = 0
@@ -69,8 +67,8 @@ class Table
     getTableMatrix
   end
 
-  def add_method
-    @headers = (1...@ws.num_rows).map { |cols| @ws[1, cols].gsub(' ', '_') }
+  def add_method #TODO: nista
+    @headers = (1...@ws.num_rows).map { |cols| @ws[1, cols].gsub(' ', '_')}
     @headers.each_with_index do |header, index|
       define_singleton_method("#{header}") do
         result = (0...@ws.num_rows-1).map { |cols| @ws.list[cols][header.gsub('_',' ')]}
@@ -103,7 +101,7 @@ class Table
     getTableMatrix
   end
 
-  def [](index)
+  def [](index) #TODO: nista
     begin
       array = (0...@ws.num_rows-1).map { |i| @ws.list[i][index] }
       Column.new(array, index, self)
@@ -113,7 +111,7 @@ class Table
     end
   end
 
-  def []=(row, column, value)
+  def []=(row, column, value) #TODO: return nill
     @ws.list[column][row] = value
   end
 
@@ -125,7 +123,7 @@ class Column
     @values, @key, @table = values, key, table
   end
 
-  def [](index)
+  def [](index) #TODO: nill
     @values[index]
   end
 
