@@ -91,12 +91,10 @@ class Table
         result = (0...@ws.num_rows-1).map { |cols| @ws.list[cols][header.gsub('_',' ')]}
         @selected = result
         @selectedHeader = index
-        p index
         self
       end
     end
   end
-
 
   def method_missing(key, *args)
     name = key.to_s
