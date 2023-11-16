@@ -23,6 +23,9 @@ p readSheets.row(1)
 p readSheets1.ws
 p readSheets1.getTableMatrix
 p readSheets1.deleteEmptyRows
+p readSheets1.ignoreTotalSubtotal
+p readSheets1.Prva_kolona.Test004
+p readSheets1.getTableMatrix
 # p readSheets.getTableMatrix()
 # p readSheets.ws
 # p readSheets.row(2)

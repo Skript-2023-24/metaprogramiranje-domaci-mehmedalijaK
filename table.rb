@@ -10,6 +10,8 @@ class Table
     @selectedHeader = 0
     @headers = []
     add_method
+    deleteEmptyRows
+    ignoreTotalSubtotal
   end
 
   def getTableMatrix()
@@ -24,15 +26,15 @@ class Table
     getTableMatrix.each { |row| row.each { |col| yield col } } #TODO: nista
   end
 
-  def sum #TODO: exception
+  def sum
     @selected.map(&:to_f).sum
   end
 
-  def avg #TODO: exception
+  def avg
     @selected.map(&:to_f).sum/@selected.length
   end
 
-  def map #TODO: nista
+  def map
     results = []
     @selected.each do |element|
       results << yield(element)
@@ -40,7 +42,7 @@ class Table
     results
   end
 
-  def select #TODO: nista
+  def select
     result = []
     @selected.each do |element|
       result << element if yield(element)
@@ -48,7 +50,7 @@ class Table
     result
   end
 
-  def reduce(init_val = nil) #TODO: nista
+  def reduce(init_val = nil)
     accumulator = init_val.nil? ? @selected[0].to_f : init_val
     @selected.each do |element|
       accumulator = yield(accumulator, element.to_f)
@@ -56,7 +58,7 @@ class Table
     accumulator
   end
 
-  def deleteEmptyRows() #TODO: check
+  def deleteEmptyRows()
     # matrix = getTableMatrix.reject.each_with_index { |row, index| row.all? { |element| element.nil? || element.to_s.strip.empty? } }
     empty_rows = (getTableMatrix.each_with_index.select { |row, index| row.all? { |element| element.nil? || element.to_s.strip.empty? } }).map{|pair| pair.last}
     delete = 0
@@ -67,7 +69,22 @@ class Table
     getTableMatrix
   end
 
-  def add_method #TODO: nista
+  def ignoreTotalSubtotal()
+    indexRows = []
+    (1..@ws.num_rows).each do |row|
+      (1..@ws.num_cols).each do |col|
+        indexRows.append(row) if @ws[row, col].eql?("Total") || @ws[row, col].eql?("Subtotal")
+      end
+    end
+    delete = 0
+    indexRows.each do |index|
+      @ws.delete_rows(index-delete, 1)
+      delete += 1
+    end
+    getTableMatrix
+  end
+
+  def add_method
     @headers = (1...@ws.num_rows).map { |cols| @ws[1, cols].gsub(' ', '_')}
     @headers.each_with_index do |header, index|
       define_singleton_method("#{header}") do
@@ -84,11 +101,7 @@ class Table
   def method_missing(key, *args)
     name = key.to_s
     val = @selected.index name
-    p name, val
-
-    result = (1..@ws.num_cols).map { |cols| @ws[val+2, cols]}
-      # TODO: NIL
-    result
+    result = val.nil? ? nil : (1..@ws.num_cols).map { |cols| @ws[val + 2, cols] }
   end
 
   def +(obj)
@@ -114,6 +127,8 @@ class Table
   def []=(row, column, value) #TODO: return nill
     @ws.list[column][row] = value
   end
+
+
 
 end
 
