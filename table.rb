@@ -1,15 +1,19 @@
 class Table
 
-  attr_accessor :ws
+  attr_accessor :ws, :headers
 
   include Enumerable
 
   def initialize(ws)
     @ws = ws
+    @selected = []
+    @selectedHeader = 0
+    @headers = []
+    add_method
   end
 
   def getTableMatrix()
-    matrix = (1..@ws. _rows).map { |row| (1..@ws.num_cols).map { |col| @ws[row, col] } }
+    matrix = (1..@ws.num_rows).map { |row| (1..@ws.num_cols).map { |col| @ws[row, col] } }
   end
 
   def row(index)
@@ -20,9 +24,88 @@ class Table
     getTableMatrix.each { |row| row.each { |col| yield col } }
   end
 
+  def sum
+    @selected.map(&:to_f).sum
+  end
+
+  def avg
+    @selected.map(&:to_f).sum/@selected.length
+  end
+
+  def map
+    results = []
+    @selected.each do |element|
+      results << yield(element)
+    end
+    results
+  end
+
+  def select
+    result = []
+    @selected.each do |element|
+      result << element if yield(element)
+    end
+    result
+  end
+
+  def reduce(init_val = nil)
+    accumulator = init_val.nil? ? @selected[0].to_f : init_val
+
+    @selected.each do |element|
+      accumulator = yield(accumulator, element.to_f)
+    end
+
+    accumulator
+  end
+
+  def deleteEmptyRows()
+    # matrix = getTableMatrix.reject.each_with_index { |row, index| row.all? { |element| element.nil? || element.to_s.strip.empty? } }
+    empty_rows = (getTableMatrix.each_with_index.select { |row, index| row.all? { |element| element.nil? || element.to_s.strip.empty? } }).map{|pair| pair.last}
+    delete = 0
+    empty_rows.each do |index|
+      @ws.delete_rows(index+1-delete, 1)
+      delete += 1
+    end
+    getTableMatrix
+  end
+
+  def add_method
+    @headers = (1...@ws.num_rows).map { |cols| @ws[1, cols].gsub(' ', '_') }
+    @headers.each_with_index do |header, index|
+      define_singleton_method("#{header}") do
+        result = (0...@ws.num_rows-1).map { |cols| @ws.list[cols][header.gsub('_',' ')]}
+        @selected = result
+        @selectedHeader = index
+        p index
+        self
+      end
+    end
+  end
+
+
+  def method_missing(key, *args)
+    name = key.to_s
+    val = @selected.index name
+    p name, val
+
+    result = (1..@ws.num_cols).map { |cols| @ws[val+2, cols]}
+      # TODO: NIL
+    result
+  end
+
+  def +(obj)
+    obj.instance_of?(Table) && obj.headers.eql?(@headers) && (2..@ws.num_rows).each { |row| (1..@ws.num_cols).each { |col| @ws[row, col] += obj.ws[row, col] } }
+    getTableMatrix
+  end
+
+  def -(obj)
+    obj.instance_of?(Table) && obj.headers.eql?(@headers) && (2..@ws.num_rows).each { |row| (1..@ws.num_cols).each { |col| (@ws[row, col].clear) if @ws[row, col].eql? obj.ws[row, col] } }
+    getTableMatrix
+  end
+
   def [](index)
     begin
-      array = (0...@ws.num_rows).map { |i| @ws.list[i][index] }
+      array = (0...@ws.num_rows-1).map { |i| @ws.list[i][index] }
       Column.new(array, index, self)
     rescue => error
       p "There is no column named #{index}"
